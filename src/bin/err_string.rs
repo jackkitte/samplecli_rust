@@ -14,10 +14,16 @@ impl fmt::Display for MyError {
     }
 }
 
+impl From<std::io::Error> for MyError {
+    fn from(cause: std::io::Error) -> Self {
+        Self::Io(cause)
+    }
+}
+
 fn get_int_file() -> Result<i32, MyError> {
     let path = "number.txt";
 
-    let num_str = std::fs::read_to_string(path).map_err(|e| MyError::Io(e))?;
+    let num_str = std::fs::read_to_string(path).map_err(MyError::from)?;
 
     num_str.trim().parse::<i32>().map(|t| t * 2).map_err(|e| MyError::Num(e))
 }
